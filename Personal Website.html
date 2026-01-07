@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apollo | Systems & Software Developer</title>
+
+  <style>
+    :root {
+      --bg-main: #020617;
+      --bg-card: rgba(17, 24, 39, 0.85);
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text-main);
+      background: var(--bg-main);
+      line-height: 1.7;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Animated Background */
+    .bg-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .gradient-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.6;
+      animation: float 20s infinite ease-in-out;
+    }
+
+    .orb-1 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(56,189,248,0.4), transparent);
+      top: -10%;
+      left: -10%;
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(139,92,246,0.35), transparent);
+      top: 20%;
+      right: -5%;
+      animation-delay: 3s;
+    }
+
+    .orb-3 {
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(34,197,94,0.3), transparent);
+      bottom: -10%;
+      left: 30%;
+      animation-delay: 6s;
+    }
+
+    .orb-4 {
+      width: 350px;
+      height: 350px;
+      background: radial-gradient(circle, rgba(236,72,153,0.25), transparent);
+      bottom: 20%;
+      right: 20%;
+      animation-delay: 9s;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      33% {
+        transform: translate(30px, -50px) scale(1.1);
+      }
+      66% {
+        transform: translate(-20px, 30px) scale(0.9);
+      }
+    }
+
+    /* Grid overlay */
+    .grid-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(56,189,248,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(56,189,248,0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: -1;
+    }
+
+    header {
+      padding: 5rem 1.5rem 4rem;
+      text-align: center;
+      position: relative;
+    }
+
+    header h1 {
+      font-size: 3.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #38bdf8, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      margin-top: 1.25rem;
+      font-size: 1.15rem;
+      color: var(--text-muted);
+    }
+
+    nav {
+      margin-top: 2.5rem;
+    }
+
+    nav a {
+      margin: 0 0.9rem;
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+
+    nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: -4px;
+      width: 0;
+      height: 2px;
+      background: var(--accent);
+      transition: width 0.25s ease;
+    }
+
+    nav a:hover {
+      color: #60d5ff;
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    section {
+      max-width: 1000px;
+      margin: 3.5rem auto;
+      padding: 0 1.5rem;
+      position: relative;
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(10px);
+      border-radius: 1.25rem;
+      padding: 2.5rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    h2 {
+      font-size: 1.9rem;
+      margin-bottom: 1.2rem;
+      font-weight: 700;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      margin-bottom: 0.4rem;
+      color: #f9fafb;
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    li {
+      margin-bottom: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    a:hover {
+      color: #60d5ff;
+      text-decoration: underline;
+    }
+
+    .contact-links {
+      display: flex;
+      gap: 2rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .contact-link {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      text-decoration: none;
+      transition: transform 0.3s ease;
+    }
+
+    .contact-link:hover {
+      transform: translateY(-5px);
+      text-decoration: none;
+    }
+
+    .contact-logo {
+      width: 60px;
+      height: 60px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 2px solid rgba(56, 189, 248, 0.3);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      transition: all 0.3s ease;
+    }
+
+    .contact-link:hover .contact-logo {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: rgba(56, 189, 248, 0.5);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+    }
+
+    .contact-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .highlight {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* Expertise Section Styles */
+    .expertise-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .expertise-item {
+      background: rgba(56, 189, 248, 0.05);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 0.75rem;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .expertise-item:hover {
+      background: rgba(56, 189, 248, 0.1);
+      border-color: rgba(56, 189, 248, 0.4);
+      transform: translateY(-3px);
+    }
+
+    .expertise-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .project-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.4rem;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-progress {
+      background: rgba(139, 92, 246, 0.2);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2.5rem 1.5rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated Background -->
+  <div class="bg-gradient">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+    <div class="gradient-orb orb-4"></div>
+  </div>
+  <div class="grid-overlay"></div>
+
+  <header>
+    <h1>Apollo</h1>
+    <p>Systems Programmer • Linux Enthusiast • Python & C Developer</p>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#expertise">Expertise</a>
+      <a href="#projects">Projects</a>
+      <a href="#skills">Skills</a>
+      <a href="#learning">Learning</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <section id="about">
+    <div class="card">
+      <h2>About Me</h2>
+      <p>
+        I'm a student developer who enjoys working close to the metal.
+        My primary interests lie in <span class="highlight">operating systems</span>,
+        <span class="highlight">Linux internals</span>, and understanding how software
+        works beneath abstractions.
+      </p>
+      <p>
+        Rather than relying heavily on frameworks, I prefer building things
+        from scratch — whether that's a minimal init system in C, a Python-based
+        package manager, or experimenting with kernels and boot processes.
+      </p>
+    </div>
+  </section>
+
+  <section id="expertise">
+    <div class="card">
+      <h2>Areas of Expertise</h2>
+      <div class="expertise-grid">
+        <div class="expertise-item">
+          <div class="expertise-icon">🐧</div>
+          <h3>Linux Systems Programming</h3>
+          <p>
+            Deep understanding of Linux internals, system calls, process management,
+            and kernel-level operations. Experience building custom init systems and
+            working with boot processes.
+          </p>
+        </div>
+        <div class="expertise-item">
+          <div class="expertise-icon">⚙️</div>
+          <h3>Operating Systems Development</h3>
+          <p>
+            Hands-on experience with OS architecture, kernel configuration, memory
+            management, and low-level system design. Building operating systems from
+            the ground up.
+          </p>
+        </div>
+        <div class="expertise-item">
+          <div class="expertise-icon">🔧</div>
+          <h3>Systems Programming in C</h3>
+          <p>
+            Proficient in C for systems-level development, including writing init
+            systems, working with POSIX APIs, and understanding memory management
+            and pointer manipulation.
+          </p>
+        </div>
+        <div class="expertise-item">
+          <div class="expertise-icon">🐍</div>
+          <h3>Python Development</h3>
+          <p>
+            Building robust Python applications including package managers, CI/CD
+            tools, and long-running services. Focus on clean architecture and
+            practical solutions.
+          </p>
+        </div>
+        <div class="expertise-item">
+          <div class="expertise-icon">🔄</div>
+          <h3>CI/CD & Automation</h3>
+          <p>
+            Designing and implementing continuous integration pipelines, automated
+            testing frameworks, and deployment workflows. Experience with YAML-based
+            pipeline configuration.
+          </p>
+        </div>
+        <div class="expertise-item">
+          <div class="expertise-icon">🐳</div>
+          <h3>Containerization & Deployment</h3>
+          <p>
+            Working with Docker and container-based environments for deploying
+            always-on services. Understanding of isolation, resource management,
+            and cloud deployment.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="projects">
+    <div class="card">
+      <h2>Projects</h2>
+      <div class="grid">
+        <div>
+          <div class="project-header">
+            <h3>Custom Linux-Based OS</h3>
+            <span class="tag tag-progress">In Progress</span>
+          </div>
+          <p>
+            A multi-semester project focused on building a Linux-based operating
+            system with a custom kernel configuration, a self-written init system
+            in C, and a minimal Python package manager.
+          </p>
+        </div>
+        <div>
+          <h3>Python CI Tool</h3>
+          <p>
+            A lightweight continuous integration system supporting YAML pipelines,
+            isolated jobs, environment variables, and test execution.
+          </p>
+        </div>
+        <div>
+          <h3>Always-On Python Services</h3>
+          <p>
+            Deployed long-running Python services that update and manage JSON data
+            reliably using cloud and container-based environments.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="card">
+      <h2>Technical Skills</h2>
+      <div class="grid">
+        <div>
+          <h3>Languages</h3>
+          <ul>
+            <li>Python</li>
+            <li>C</li>
+            <li>Bash / Shell</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Systems & Tools</h3>
+          <ul>
+            <li>Linux, QEMU, GRUB</li>
+            <li>Docker & Containers</li>
+            <li>Git & GitHub</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Core Concepts</h3>
+          <ul>
+            <li>OS Internals & Boot Process</li>
+            <li>Process & Memory Basics</li>
+            <li>CI/CD Fundamentals</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="learning">
+    <div class="card">
+      <h2>What I'm Learning</h2>
+      <ul>
+        <li>Kernel configuration and debugging</li>
+        <li>Low-level userspace design</li>
+        <li>Networking and system security fundamentals</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="card">
+      <h2>Contact</h2>
+      <p style="text-align: center; margin-bottom: 2rem;">Let's connect! Feel free to reach out through any of these platforms.</p>
+      <div class="contact-links">
+        <a href="mailto:cuberocker1857@gmail.com" class="contact-link">
+          <div class="contact-logo">📧</div>
+          <span class="contact-label">Email</span>
+        </a>
+        <a href="https://github.com/thesungod07" target="_blank" rel="noopener" class="contact-link">
+          <div class="contact-logo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" style="color: #38bdf8;">
+              <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </div>
+          <span class="contact-label">GitHub</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © 2026 Apollo · Built from scratch · No frameworks
+  </footer>
+
+</body>
+</html>
