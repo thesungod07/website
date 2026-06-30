@@ -25,7 +25,22 @@ jobs:
           TOKEN   = os.environ["HTB_TOKEN"]
           USER_ID = os.environ["HTB_USER_ID"]
           BASE    = "https://www.hackthebox.com/api/v4"
-          HEADERS = {"Authorization": f"Bearer {TOKEN}", "Accept": "application/json"}
+
+          # Cloudflare in front of HTB fingerprints requests and blocks
+          # anything that doesn't look like a real browser. We mimic one.
+          HEADERS = {
+              "Authorization": f"Bearer {TOKEN}",
+              "Accept": "application/json, text/plain, */*",
+              "Accept-Language": "en-US,en;q=0.9",
+              "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                              "AppleWebKit/537.36 (KHTML, like Gecko) "
+                              "Chrome/126.0.0.0 Safari/537.36"),
+              "Origin": "https://app.hackthebox.com",
+              "Referer": "https://app.hackthebox.com/",
+              "Sec-Fetch-Site": "same-site",
+              "Sec-Fetch-Mode": "cors",
+              "Sec-Fetch-Dest": "empty",
+          }
 
           if not TOKEN:
               print("FATAL: HTB_TOKEN secret is empty or not set!")
@@ -65,7 +80,7 @@ jobs:
           s    = season_raw.get("data") or season_raw or {}
 
           out = {
-              "fetched_at": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "fetched_at": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
               "profile": {
                   "name":                 p.get("name"),
                   "rank":                 p.get("rank"),
