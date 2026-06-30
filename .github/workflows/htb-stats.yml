@@ -1,0 +1,95 @@
+name: Refresh HTB Stats
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'   # runs every 2 hours
+  workflow_dispatch:          # also triggerable manually from Actions tab
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch & write stats.json
+        env:
+          HTB_TOKEN:   ${{ secrets.HTB_TOKEN }}
+          HTB_USER_ID: "2589442"
+        run: |
+          python3 << 'PYEOF'
+          import os, json, urllib.request, datetime
+
+          TOKEN   = os.environ["HTB_TOKEN"]
+          USER_ID = os.environ["HTB_USER_ID"]
+          BASE    = "https://www.hackthebox.com/api/v4"
+          HEADERS = {"Authorization": f"Bearer {TOKEN}", "Accept": "application/json"}
+
+          def get(path):
+              req = urllib.request.Request(BASE + path, headers=HEADERS)
+              try:
+                  with urllib.request.urlopen(req, timeout=15) as r:
+                      return json.loads(r.read())
+              except Exception as e:
+                  print(f"WARN: {path} failed: {e}")
+                  return {}
+
+          profile_raw  = get(f"/user/profile/basic/{USER_ID}")
+          activity_raw = get(f"/profile/activity/{USER_ID}")
+          season_raw   = get("/season/user/season-rank")
+
+          p    = profile_raw.get("profile", {})
+          acts = (activity_raw.get("profile", {}).get("activity")
+                  or activity_raw.get("data") or [])
+          s    = season_raw.get("data") or season_raw or {}
+
+          out = {
+              "fetched_at": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+              "profile": {
+                  "name":                 p.get("name"),
+                  "rank":                 p.get("rank"),
+                  "rank_id":              p.get("rank_id"),
+                  "level":                p.get("level"),
+                  "points":               p.get("points"),
+                  "ranking":              p.get("ranking"),
+                  "user_owns":            p.get("user_owns", 0),
+                  "system_owns":          p.get("system_owns", 0),
+                  "challenge_owns":       p.get("challenge_owns", 0),
+                  "sherlock_owns":        p.get("sherlock_owns", 0),
+                  "user_bloods":          p.get("user_bloods", 0),
+                  "system_bloods":        p.get("system_bloods", 0),
+                  "rank_ownership":       p.get("rank_ownership"),
+                  "next_rank":            p.get("next_rank"),
+                  "next_rank_points":     p.get("next_rank_points"),
+                  "current_rank_progress":p.get("current_rank_progress"),
+                  "avatar":               p.get("avatar"),
+                  "country_name":         p.get("country_name"),
+              },
+              "season": {
+                  "name":          s.get("season_name") or s.get("name"),
+                  "rank":          s.get("rank"),
+                  "tier":          s.get("tier") or s.get("tier_name"),
+                  "tier_progress": s.get("tier_progress") or s.get("percentage") or 0,
+                  "points":        s.get("points"),
+              },
+              "activity": acts[:50],
+          }
+
+          with open("stats.json", "w") as f:
+              json.dump(out, f, indent=2, default=str)
+
+          print(f"Done — profile: {p.get('name')}, rank: {p.get('rank')}, "
+                f"activity items: {len(acts)}")
+          PYEOF
+
+      - name: Commit stats.json
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add stats.json
+          git diff --cached --quiet && echo "No changes" || (
+            git commit -m "chore: refresh HTB stats [skip ci]"
+            git push
+          )
