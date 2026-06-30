@@ -1,0 +1,31 @@
+{
+  "fetched_at": "2026-06-30T06:08:13Z",
+  "profile": {
+    "name": null,
+    "rank": null,
+    "rank_id": null,
+    "level": null,
+    "points": null,
+    "ranking": null,
+    "user_owns": 0,
+    "system_owns": 0,
+    "challenge_owns": 0,
+    "sherlock_owns": 0,
+    "user_bloods": 0,
+    "system_bloods": 0,
+    "rank_ownership": null,
+    "next_rank": null,
+    "next_rank_points": null,
+    "current_rank_progress": null,
+    "avatar": null,
+    "country_name": null
+  },
+  "season": {
+    "name": null,
+    "rank": null,
+    "tier": null,
+    "tier_progress": 0,
+    "points": null
+  },
+  "activity": []
+}
