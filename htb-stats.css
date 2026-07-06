@@ -1,0 +1,366 @@
+/* ============================================================
+   HTB STATS SECTION — HackTheBox stats in green/black theme
+   ============================================================ */
+
+/* ── Section header ── */
+.htb-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.htb-header-row .section-label {
+  margin-bottom: 0;
+}
+
+.htb-live-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--green);
+  background: rgba(74, 222, 128, 0.08);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  letter-spacing: 0.08em;
+}
+
+.htb-live-badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse-dot 2s infinite;
+}
+
+/* ── Rank Cards Row ── */
+.htb-rank-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.htb-rank-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.htb-rank-card:hover {
+  border-color: rgba(74, 222, 128, 0.2);
+  box-shadow: 0 0 15px rgba(74, 222, 128, 0.05);
+}
+
+.htb-rank-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.htb-rank-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.htb-rank-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.htb-rank-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.htb-rank-title {
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--green-text);
+  line-height: 1.2;
+}
+
+.htb-rank-detail {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-mid);
+}
+
+.htb-rank-detail strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ── Stats Grid ── */
+.htb-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.htb-stat-cell {
+  background: var(--bg-card);
+  padding: 1.1rem 1rem;
+  text-align: center;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.htb-stat-cell:hover {
+  background: rgba(74, 222, 128, 0.02);
+}
+
+.htb-stat-number {
+  font-family: var(--mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--green);
+  line-height: 1.15;
+}
+
+.htb-stat-number.count-up {
+  transition: all 0.01s;
+}
+
+.htb-stat-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 0.15rem;
+}
+
+/* ── Activity Feed ── */
+.htb-activity-header {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.htb-activity-header::before {
+  content: '──';
+  opacity: 0.4;
+}
+
+.htb-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.htb-activity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 1rem;
+  background: var(--bg-card);
+  font-family: var(--mono);
+  font-size: 12px;
+  transition: background 0.2s;
+}
+
+.htb-activity-item:hover {
+  background: rgba(74, 222, 128, 0.02);
+}
+
+.htb-activity-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.htb-activity-icon.machine { background: rgba(74, 222, 128, 0.1); }
+.htb-activity-icon.challenge { background: rgba(250, 204, 21, 0.1); }
+.htb-activity-icon.sherlock { background: rgba(96, 165, 250, 0.1); }
+
+.htb-activity-name {
+  color: var(--text);
+  font-weight: 500;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.htb-activity-type {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: var(--text-muted);
+  border: 1px solid var(--border-bright);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+
+.htb-activity-type.root {
+  border-color: rgba(248, 113, 113, 0.3);
+  color: #f87171;
+}
+
+.htb-activity-type.user {
+  border-color: rgba(74, 222, 128, 0.3);
+  color: var(--green-text);
+}
+
+.htb-activity-type.challenge {
+  border-color: rgba(250, 204, 21, 0.3);
+  color: #facc15;
+}
+
+.htb-activity-type.sherlock {
+  border-color: rgba(96, 165, 250, 0.3);
+  color: #60a5fa;
+}
+
+.htb-activity-date {
+  font-size: 10px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* ── Profile Link ── */
+.htb-profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-mid);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.htb-profile-link:hover {
+  color: var(--green);
+}
+
+.htb-profile-link svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+/* ── Tier Badge (avatar inside frame) ── */
+.htb-tier-badge {
+  position: relative;
+  width: 52px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.htb-tier-avatar {
+  position: absolute;
+  width: 68%;
+  height: 64%;
+  border-radius: 50%;
+  object-fit: cover;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  z-index: 0;
+}
+
+.htb-tier-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.htb-tier-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* ── Loading / Error States ── */
+.htb-loading {
+  text-align: center;
+  padding: 2rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.htb-loading .spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--border-bright);
+  border-top-color: var(--green);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .htb-rank-row {
+    grid-template-columns: 1fr;
+  }
+
+  .htb-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .htb-rank-card {
+    padding: 1rem;
+  }
+
+  .htb-tier-badge {
+    width: 40px;
+    height: 46px;
+  }
+
+  .htb-rank-title {
+    font-size: 14px;
+  }
+}
