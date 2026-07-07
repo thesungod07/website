@@ -1,0 +1,87 @@
+name: Update HTB Stats
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch HTB profile
+        run: |
+          curl -s --max-time 15 "https://labs.hackthebox.com/api/v4/profile/2589442" > /tmp/profile.json
+
+      - name: Fetch HTB activity
+        run: |
+          curl -sL --max-time 15 "https://labs.hackthebox.com/api/v5/user/profile/activity/2589442?per_page=200" > /tmp/activity.json || true
+
+      - name: Generate htb-data.json
+        run: |
+          python3 << 'PYEOF'
+          import json
+          from datetime import datetime, timezone
+
+          with open('/tmp/profile.json') as f:
+              profile = json.load(f)
+          p = profile.get('profile', profile)
+
+          try:
+              with open('/tmp/activity.json') as f:
+                  activity_data = json.load(f)
+              activities = (activity_data or {}).get('data', [])
+          except (json.JSONDecodeError, FileNotFoundError):
+              activities = []
+
+          seen = {'challenge': set(), 'sherlock': set()}
+          for a in activities:
+              t = a.get('type')
+              if t in seen:
+                  seen[t].add(a['name'])
+
+          data = {
+              'updated': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
+              'user': {'id': p['id'], 'name': p['name']},
+              'rank': {'id': p.get('rank_id', 3), 'title': p.get('rank', 'Hacker')},
+              'season': {
+                  'id': 15,
+                  'name': 'Season 11',
+                  'league': 'Ruby',
+                  'rank': 2097,
+                  'totalParticipants': 11093,
+                  'points': 350,
+                  'active': True,
+              },
+              'stats': {
+                  'machines': p.get('user_owns', 0),
+                  'machinesRooted': p.get('system_owns', 0),
+                  'challenges': len(seen.get('challenge', set())) or 0,
+                  'sherlocks': len(seen.get('sherlock', set())) or 0,
+              },
+              'activity': activities[:30],
+          }
+
+          with open('htb-data.json', 'w') as f:
+              json.dump(data, f, indent=2)
+              f.write('\n')
+
+          print(f"OK — machines={data['stats']['machines']} challenges={data['stats']['challenges']} sherlocks={data['stats']['sherlocks']}")
+          PYEOF
+
+      - name: Commit & push if changed
+        run: |
+          git config user.name "htb-bot"
+          git config user.email "htb-bot@users.noreply.github.com"
+          git add htb-data.json
+          if git diff --cached --quiet; then
+            echo "No changes"
+          else
+            git commit -m "auto: update HTB stats [skip ci]"
+            git push
+          fi

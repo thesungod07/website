@@ -1,55 +1,7 @@
 (function () {
   'use strict';
 
-  /* ============================================================
-   *  HTB STATS — Embedded data & rendering
-   *  Data pre-fetched from HTB public API on 2026-07-06
-   * ============================================================ */
-
-  const HTB_DATA = {
-    user: { id: 2589442, name: 'thesungod07' },
-
-    /* Rank / Level (from what's publicly known) */
-    rank: { id: 3, title: 'Hacker', level: 7 },
-
-    /* Current Season (Season 11 — "Season of the Punk") */
-    season: {
-      id: 15,
-      name: 'Season 11',
-      league: 'Ruby',
-      rank: 2097,
-      totalParticipants: 11093,
-      points: 350,
-      flagsObtained: 12,
-      flagsTotal: 26,
-      userOwns: 6,
-      rootOwns: 6,
-      bloods: 0,
-      active: true,
-    },
-
-    /* All-time stats from activity feed */
-    stats: {
-      machines: 11,
-      machinesRooted: 10,
-      challenges: 17,
-      sherlocks: 2,
-    },
-
-    /* Recent activity (last 10 items) */
-    activity: [
-      { type: 'root',     name: 'MakeSense',     date: '2026-07-05T08:37:04.000Z', points: 30 },
-      { type: 'user',     name: 'MakeSense',     date: '2026-07-05T08:29:49.000Z', points: 15 },
-      { type: 'challenge',name: 'Baby Frame',     date: '2026-07-04T16:41:33.000Z', points: 0 },
-      { type: 'root',     name: 'Kobold',         date: '2026-07-04T10:07:59.000Z', points: 20 },
-      { type: 'user',     name: 'Kobold',         date: '2026-07-04T09:57:50.000Z', points: 10 },
-      { type: 'challenge',name: 'Forklifts R Us', date: '2026-06-28T15:40:07.000Z', points: 2 },
-      { type: 'root',     name: 'Silentium',      date: '2026-06-28T14:24:36.000Z', points: 20 },
-      { type: 'user',     name: 'Silentium',      date: '2026-06-28T10:40:59.000Z', points: 10 },
-      { type: 'user',     name: 'Nexus',          date: '2026-06-27T20:39:54.000Z', points: 0 },
-      { type: 'user',     name: 'Enigma',         date: '2026-06-27T19:47:21.000Z', points: 10 },
-    ],
-  };
+  let htbData = null;
 
   /* ============================================================
    *  BADGES — fetched live from HTB CDN
@@ -114,13 +66,11 @@
     }
   }
 
-
   /* ============================================================
    *  RENDER SECTION
    * ============================================================ */
 
-  function render(data) {
-    const d = data || HTB_DATA;
+  function render(d) {
     const s = d.season;
     const st = d.stats;
     const rid = d.rank && d.rank.id ? d.rank.id : 3;
@@ -229,14 +179,12 @@
   function updateRankCards(d, rid) {
     const cards = document.querySelectorAll('.htb-rank-card');
     if (!cards.length) return;
-    /* XP rank card */
     const icon0 = cards[0].querySelector('.htb-rank-icon');
     if (icon0) icon0.innerHTML = rankBadge(rid);
     const title0 = cards[0].querySelector('.htb-rank-title');
     if (title0) title0.textContent = d.rank.title;
     const detail0 = cards[0].querySelector('.htb-rank-detail');
     if (detail0) detail0.textContent = d.stats.machines + ' machines owned';
-    /* Season card */
     const icon1 = cards[1].querySelector('.htb-rank-icon');
     if (icon1) icon1.innerHTML = seasonBadge(d.season.league);
     const label1 = cards[1].querySelector('.htb-rank-label');
@@ -286,13 +234,22 @@
         }
       });
     }, { threshold: 0.5 });
-
     counters.forEach(c => observer.observe(c));
   }
 
   /* ============================================================
-   *  AUTO-REFRESH — fetch fresh activity every hour
+   *  DATA LOADING
    * ============================================================ */
+
+  async function loadData() {
+    try {
+      const res = await fetch('htb-data.json');
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  }
 
   const PROXY = 'https://api.allorigins.win/raw?url=';
 
@@ -320,9 +277,10 @@
     };
   }
 
-  function updateActivity(data) {
-    if (!data || !data.data) return;
-    const items = data.data.slice(0, 8);
+  function updateActivityFromAPI(data) {
+    if (!data || !data.data || !htbData) return;
+    const allItems = data.data;
+    const items = allItems.slice(0, 8);
     if (!items.length) return;
     const list = document.querySelector('.htb-activity-list');
     if (!list) return;
@@ -336,34 +294,58 @@
       </div>
     `).join('');
 
+    const seen = { challenge: new Set(), sherlock: new Set() };
+    for (const a of allItems) {
+      if (a.type === 'challenge' || a.type === 'sherlock') seen[a.type].add(a.name);
+    }
+    if (seen.challenge.size) htbData.stats.challenges = seen.challenge.size;
+    if (seen.sherlock.size)  htbData.stats.sherlocks = seen.sherlock.size;
+
+    const cells = document.querySelectorAll('.htb-stat-cell .htb-stat-number');
+    if (cells.length >= 4) {
+      const vals = [htbData.stats.machines, htbData.stats.challenges, htbData.stats.sherlocks, htbData.season.points];
+      cells.forEach((el, i) => {
+        el.textContent = vals[i];
+        el.setAttribute('data-count', vals[i]);
+      });
+    }
+
     const badge = document.querySelector('.htb-live-badge');
     if (badge) badge.textContent = 'updated ' + formatDate(new Date().toISOString());
   }
 
   async function refresh() {
+    if (!htbData) return;
+
     const [profileData, activityData] = await Promise.all([
-      fetchJSON('https://labs.hackthebox.com/api/v4/profile/' + HTB_DATA.user.id),
-      fetchJSON('https://labs.hackthebox.com/api/v5/user/profile/activity/' + HTB_DATA.user.id + '?per_page=10'),
+      fetchJSON('https://labs.hackthebox.com/api/v4/profile/' + htbData.user.id),
+      fetchJSON('https://labs.hackthebox.com/api/v5/user/profile/activity/' + htbData.user.id + '?per_page=200'),
     ]);
+
+    if (activityData) updateActivityFromAPI(activityData);
 
     if (profileData) {
       const p = parseProfile(profileData);
       if (p) {
-        HTB_DATA.rank.id = p.rank.id;
-        HTB_DATA.rank.title = p.rank.title;
-        HTB_DATA.stats.machines = p.machines;
-        render(HTB_DATA);
+        htbData.rank.id = p.rank.id;
+        htbData.rank.title = p.rank.title;
+        htbData.stats.machines = p.machines;
+        render(htbData);
       }
     }
-    if (activityData) updateActivity(activityData);
   }
 
-  function start() {
-    render(HTB_DATA);
-    /* Fetch fresh data on load, then every hour */
+  async function start() {
+    const cached = await loadData();
+    if (cached) {
+      htbData = cached;
+      render(htbData);
+    }
     setTimeout(refresh, 1000);
     setInterval(refresh, 3600000);
   }
+
+  window.__refreshHTB = refresh;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start);
