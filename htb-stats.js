@@ -8,7 +8,7 @@
     updated: '2026-07-07T11:38:24.178677Z',
     user: { id: 2589442, name: 'thesungod25' },
     rank: { id: 3, title: 'Hacker' },
-    season: { id: 15, name: 'Season 11', league: 'Ruby', rank: 2097, totalParticipants: 11093, points: 350, active: true },
+    season: { id: 15, name: 'Season 11', league: 'Ruby', rank: 2120, totalParticipants: 11105, points: 350, active: true },
     stats: { machines: 11, machinesRooted: 10, challenges: 18, sherlocks: 2 },
     activity: [
       { type: 'root',     name: 'MakeSense',     date: '2026-07-05T08:37:04.000Z' },
@@ -277,102 +277,13 @@
     }
   }
 
-  const PROXY = 'https://api.allorigins.win/raw?url=';
-
-  async function fetchJSON(url) {
-    try {
-      const res = await fetch(PROXY + encodeURIComponent(url), { signal: AbortSignal.timeout(8000) });
-      if (!res.ok) return null;
-      return await res.json();
-    } catch {
-      return null;
-    }
-  }
-
-  function parseProfile(raw) {
-    const p = (raw && raw.profile) || raw;
-    if (!p || !p.id) return null;
-    return {
-      id: p.id,
-      name: p.name,
-      rank: { id: p.rank_id || 3, title: p.rank || 'Hacker' },
-      points: p.points || 0,
-      machines: p.user_owns || 0,
-      systemOwns: p.system_owns || 0,
-      userOwns: p.user_owns || 0,
-    };
-  }
-
-  function updateActivityFromAPI(data) {
-    if (!data || !data.data || !htbData) return;
-    const allItems = data.data;
-    const items = allItems.slice(0, 8);
-    if (!items.length) return;
-    const list = document.querySelector('.htb-activity-list');
-    if (!list) return;
-
-    list.innerHTML = items.map(a => `
-      <div class="htb-activity-item">
-        <div class="htb-activity-icon ${a.type === 'root' || a.type === 'user' ? 'machine' : a.type}">${activityIcon(a.type)}</div>
-        <span class="htb-activity-name">${a.name}</span>
-        <span class="htb-activity-type ${a.type}">${a.type}</span>
-        <span class="htb-activity-date">${formatDate(a.ownDate || a.date)}</span>
-      </div>
-    `).join('');
-
-    const seen = { challenge: new Set(), sherlock: new Set() };
-    for (const a of allItems) {
-      if (a.type === 'challenge' || a.type === 'sherlock') seen[a.type].add(a.name);
-    }
-    if (seen.challenge.size) htbData.stats.challenges = seen.challenge.size;
-    if (seen.sherlock.size)  htbData.stats.sherlocks = seen.sherlock.size;
-
-    const cells = document.querySelectorAll('.htb-stat-cell .htb-stat-number');
-    if (cells.length >= 4) {
-      const vals = [htbData.stats.machines, htbData.stats.challenges, htbData.stats.sherlocks, htbData.season.points];
-      cells.forEach((el, i) => {
-        el.textContent = vals[i];
-        el.setAttribute('data-count', vals[i]);
-      });
-    }
-
-    const badge = document.querySelector('.htb-live-badge');
-    if (badge) badge.textContent = 'updated ' + formatDate(new Date().toISOString());
-  }
-
-  async function refresh() {
-    if (!htbData) return;
-
-    const [profileData, activityData] = await Promise.all([
-      fetchJSON('https://labs.hackthebox.com/api/v4/profile/' + htbData.user.id),
-      fetchJSON('https://labs.hackthebox.com/api/v5/user/profile/activity/' + htbData.user.id + '?per_page=200'),
-    ]);
-
-    if (activityData) updateActivityFromAPI(activityData);
-
-    if (profileData) {
-      const p = parseProfile(profileData);
-      if (p) {
-        htbData.rank.id = p.rank.id;
-        htbData.rank.title = p.rank.title;
-        htbData.stats.machines = p.machines;
-        render(htbData);
-      }
-    }
-  }
-
   async function start() {
     const cached = await loadData();
     if (cached) {
       htbData = cached;
       render(htbData);
     }
-    setTimeout(refresh, 1000);
-    setInterval(refresh, 3600000);
   }
-
-  window.__htbReady = true;
-  window.__refreshHTB = refresh;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start);

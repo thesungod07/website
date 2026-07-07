@@ -1037,11 +1037,6 @@ setInterval(fetchPresence, 30000); // refresh every 30s
  *   'open gh': handled by checking args[0] === 'gh' inside the 'open' command
  */
 
-  window.__htbReady = false;
-  window.__refreshHTB = function () {
-    console.warn('htb-stats not loaded yet');
-  };
-
   const COMMANDS = {
     help: {
     desc: 'list available commands.',
@@ -1201,20 +1196,6 @@ setInterval(fetchPresence, 30000); // refresh every 30s
     }
   }, 
 
-  // ── ADD YOUR OWN COMMANDS BELOW THIS LINE ─────────────────────────────────
-  htb: {
-    desc: 'htb update — fetch latest HTB stats (live API).',
-    run: (args) => {
-      if (args[0] === 'update') {
-        if (window.__htbReady) {
-          window.__refreshHTB();
-          return [{ text: '→ fetching live HTB stats… (may fail if CORS proxy is down)', cls: 't-green' }];
-        }
-        return [{ text: 'htb: stats module not loaded.', cls: 't-err' }];
-      }
-      return [{ text: 'usage: htb update', cls: 't-dim' }];
-    }
-  },
   // ─────────────────────────────────────────────────────────────────────────
 };
 
