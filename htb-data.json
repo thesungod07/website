@@ -1,5 +1,9 @@
 {
+<<<<<<< HEAD
   "updated": "2026-07-07T11:38:24.178677Z",
+=======
+  "updated": "2026-07-07T15:08:32.618422Z",
+>>>>>>> ffb1776425d2199ace2678dd329f9e25312bbd69
   "user": {
     "id": 2589442,
     "name": "thesungod25"
@@ -20,9 +24,10 @@
   "stats": {
     "machines": 11,
     "machinesRooted": 10,
-    "challenges": 18,
-    "sherlocks": 2
+    "challenges": 0,
+    "sherlocks": 0
   },
+<<<<<<< HEAD
   "activity": [
     {
       "type": "root",
@@ -100,4 +105,7 @@
       "date": "2026-06-08T12:00:00.000Z"
     }
   ]
+=======
+  "activity": []
+>>>>>>> ffb1776425d2199ace2678dd329f9e25312bbd69
 }
