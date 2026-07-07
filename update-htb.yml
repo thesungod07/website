@@ -16,7 +16,7 @@ jobs:
 
       - name: Fetch HTB profile
         run: |
-          curl -s --max-time 15 "https://labs.hackthebox.com/api/v4/profile/2589442" > /tmp/profile.json
+          curl -sL --max-time 15 "https://labs.hackthebox.com/api/v4/profile/2589442" > /tmp/profile.json || true
 
       - name: Fetch HTB activity
         run: |
@@ -24,7 +24,7 @@ jobs:
 
       - name: Fetch HTB season ranks
         run: |
-          curl -s --max-time 15 "https://labs.hackthebox.com/api/v4/season/user/2589442/ranks" > /tmp/season.json
+          curl -sL --max-time 15 "https://labs.hackthebox.com/api/v4/season/user/2589442/ranks" > /tmp/season.json || true
 
       - name: Generate htb-data.json
         run: |
@@ -32,24 +32,48 @@ jobs:
           import json
           from datetime import datetime, timezone
 
-          with open('/tmp/profile.json') as f:
-              profile = json.load(f)
-          p = profile.get('profile', profile)
+          # Load previous data for fallback (exists after first run)
+          prev = {}
+          try:
+              with open('htb-data.json') as f:
+                  prev = json.load(f)
+          except (json.JSONDecodeError, FileNotFoundError):
+              pass
 
+          # ── Profile ──────────────────────────────────────────────
+          try:
+              with open('/tmp/profile.json') as f:
+                  raw = json.load(f)
+              p = raw.get('profile', raw)
+              if not p.get('id'): raise ValueError
+          except (json.JSONDecodeError, FileNotFoundError, ValueError):
+              p = prev.get('user', {})
+              p['rank_id'] = prev.get('rank', {}).get('id', 3)
+              p['rank'] = prev.get('rank', {}).get('title', 'Hacker')
+              p['user_owns'] = prev.get('stats', {}).get('machines', 0)
+              p['system_owns'] = prev.get('stats', {}).get('machinesRooted', 0)
+
+          # ── Activity ─────────────────────────────────────────────
           try:
               with open('/tmp/activity.json') as f:
                   activity_data = json.load(f)
               activities = (activity_data or {}).get('data', [])
           except (json.JSONDecodeError, FileNotFoundError):
-              activities = []
+              activities = prev.get('activity', [])
 
+          # ── Season ───────────────────────────────────────────────
           try:
               with open('/tmp/season.json') as f:
                   season_data = json.load(f)
-              s = next((s for s in season_data.get('data', []) if s.get('season_id')), season_data.get('data', [{}])[0])
-          except (json.JSONDecodeError, IndexError, FileNotFoundError):
-              s = {}
+              season_entry = next(
+                  (s for s in season_data.get('data', []) if s.get('season_id')),
+                  season_data.get('data', [None])[0]
+              )
+              if not season_entry or not season_entry.get('league'): raise ValueError
+          except (json.JSONDecodeError, FileNotFoundError, ValueError, TypeError):
+              season_entry = prev.get('season', {})
 
+          # ── Count unique challenges/sherlocks from activity ──────
           seen = {'challenge': set(), 'sherlock': set()}
           for a in activities:
               t = a.get('type')
@@ -58,31 +82,31 @@ jobs:
 
           data = {
               'updated': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
-              'user': {'id': p['id'], 'name': p['name']},
+              'user': {'id': p.get('id', 2589442), 'name': p.get('name', 'thesungod25')},
               'rank': {'id': p.get('rank_id', 3), 'title': p.get('rank', 'Hacker')},
               'season': {
-                  'id': s.get('season_id', 15),
-                  'name': s.get('season_name', 'Season 11'),
-                  'league': s.get('league', 'Ruby'),
-                  'rank': s.get('rank', 2120),
-                  'totalParticipants': s.get('total_ranks', 11104),
-                  'points': s.get('total_season_points', 350),
+                  'id': season_entry.get('season_id', 15),
+                  'name': season_entry.get('season_name', 'Season 11'),
+                  'league': season_entry.get('league', 'Ruby'),
+                  'rank': season_entry.get('rank', 0),
+                  'totalParticipants': season_entry.get('total_ranks', 0),
+                  'points': season_entry.get('total_season_points', 0),
                   'active': True,
               },
               'stats': {
                   'machines': p.get('user_owns', 0),
                   'machinesRooted': p.get('system_owns', 0),
-                  'challenges': len(seen.get('challenge', set())) or 0,
-                  'sherlocks': len(seen.get('sherlock', set())) or 0,
+                  'challenges': len(seen.get('challenge', set())) or prev.get('stats', {}).get('challenges', 0),
+                  'sherlocks': len(seen.get('sherlock', set())) or prev.get('stats', {}).get('sherlocks', 0),
               },
-              'activity': activities[:30],
+              'activity': activities[:30] if activities else prev.get('activity', []),
           }
 
           with open('htb-data.json', 'w') as f:
               json.dump(data, f, indent=2)
               f.write('\n')
 
-          print(f"OK — machines={data['stats']['machines']} challenges={data['stats']['challenges']} sherlocks={data['stats']['sherlocks']} season_rank={data['season']['rank']}")
+          print(f"OK — machines={data['stats']['machines']} challenges={data['stats']['challenges']} sherlocks={data['stats']['sherlocks']} season_rank={data['season']['rank']} season_points={data['season']['points']}")
           PYEOF
 
       - name: Commit & push if changed

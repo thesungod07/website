@@ -1,9 +1,5 @@
 {
-<<<<<<< HEAD
   "updated": "2026-07-07T11:38:24.178677Z",
-=======
-  "updated": "2026-07-07T15:08:32.618422Z",
->>>>>>> ffb1776425d2199ace2678dd329f9e25312bbd69
   "user": {
     "id": 2589442,
     "name": "thesungod25"
@@ -16,18 +12,17 @@
     "id": 15,
     "name": "Season 11",
     "league": "Ruby",
-    "rank": 2120,
-    "totalParticipants": 11105,
+    "rank": 2127,
+    "totalParticipants": 11110,
     "points": 350,
     "active": true
   },
   "stats": {
     "machines": 11,
     "machinesRooted": 10,
-    "challenges": 0,
-    "sherlocks": 0
+    "challenges": 18,
+    "sherlocks": 2
   },
-<<<<<<< HEAD
   "activity": [
     {
       "type": "root",
@@ -105,7 +100,4 @@
       "date": "2026-06-08T12:00:00.000Z"
     }
   ]
-=======
-  "activity": []
->>>>>>> ffb1776425d2199ace2678dd329f9e25312bbd69
 }

@@ -8,7 +8,7 @@
     updated: '2026-07-07T11:38:24.178677Z',
     user: { id: 2589442, name: 'thesungod25' },
     rank: { id: 3, title: 'Hacker' },
-    season: { id: 15, name: 'Season 11', league: 'Ruby', rank: 2120, totalParticipants: 11105, points: 350, active: true },
+    season: { id: 15, name: 'Season 11', league: 'Ruby', rank: 2127, totalParticipants: 11110, points: 350, active: true },
     stats: { machines: 11, machinesRooted: 10, challenges: 18, sherlocks: 2 },
     activity: [
       { type: 'root',     name: 'MakeSense',     date: '2026-07-05T08:37:04.000Z' },
