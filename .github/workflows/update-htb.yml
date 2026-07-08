@@ -18,10 +18,6 @@ jobs:
         run: |
           curl -sL --max-time 15 "https://labs.hackthebox.com/api/v4/profile/2589442" > /tmp/profile.json || true
 
-      - name: Fetch HTB activity
-        run: |
-          curl -sL --max-time 15 "https://labs.hackthebox.com/api/v5/user/profile/activity/2589442?per_page=200" > /tmp/activity.json || true
-
       - name: Fetch HTB season ranks
         run: |
           curl -sL --max-time 15 "https://labs.hackthebox.com/api/v4/season/user/2589442/ranks" > /tmp/season.json || true
@@ -32,7 +28,6 @@ jobs:
           import json
           from datetime import datetime, timezone
 
-          # Load previous data for fallback (exists after first run)
           prev = {}
           try:
               with open('htb-data.json') as f:
@@ -53,14 +48,6 @@ jobs:
               p['user_owns'] = prev.get('stats', {}).get('machines', 0)
               p['system_owns'] = prev.get('stats', {}).get('machinesRooted', 0)
 
-          # ── Activity ─────────────────────────────────────────────
-          try:
-              with open('/tmp/activity.json') as f:
-                  activity_data = json.load(f)
-              activities = (activity_data or {}).get('data', [])
-          except (json.JSONDecodeError, FileNotFoundError):
-              activities = prev.get('activity', [])
-
           # ── Season ───────────────────────────────────────────────
           try:
               with open('/tmp/season.json') as f:
@@ -72,13 +59,6 @@ jobs:
               if not season_entry or not season_entry.get('league'): raise ValueError
           except (json.JSONDecodeError, FileNotFoundError, ValueError, TypeError):
               season_entry = prev.get('season', {})
-
-          # ── Count unique challenges/sherlocks from activity ──────
-          seen = {'challenge': set(), 'sherlock': set()}
-          for a in activities:
-              t = a.get('type')
-              if t in seen:
-                  seen[t].add(a['name'])
 
           data = {
               'updated': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
@@ -96,17 +76,16 @@ jobs:
               'stats': {
                   'machines': p.get('user_owns', 0),
                   'machinesRooted': p.get('system_owns', 0),
-                  'challenges': len(seen.get('challenge', set())) or prev.get('stats', {}).get('challenges', 0),
-                  'sherlocks': len(seen.get('sherlock', set())) or prev.get('stats', {}).get('sherlocks', 0),
+                  'challenges': 18,
+                  'sherlocks': 2,
               },
-              'activity': activities[:30] if activities else prev.get('activity', []),
           }
 
           with open('htb-data.json', 'w') as f:
               json.dump(data, f, indent=2)
               f.write('\n')
 
-          print(f"OK — machines={data['stats']['machines']} challenges={data['stats']['challenges']} sherlocks={data['stats']['sherlocks']} season_rank={data['season']['rank']} season_points={data['season']['points']}")
+          print(f"OK — machines={data['stats']['machines']} season_rank={data['season']['rank']} season_points={data['season']['points']}")
           PYEOF
 
       - name: Commit & push if changed

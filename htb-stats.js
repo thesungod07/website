@@ -10,23 +10,6 @@
     rank: { id: 3, title: 'Hacker' },
     season: { id: 15, name: 'Season 11', league: 'Ruby', rank: 2127, totalParticipants: 11110, points: 350, active: true },
     stats: { machines: 11, machinesRooted: 10, challenges: 18, sherlocks: 2 },
-    activity: [
-      { type: 'root',     name: 'MakeSense',     date: '2026-07-05T08:37:04.000Z' },
-      { type: 'user',     name: 'MakeSense',     date: '2026-07-05T08:29:49.000Z' },
-      { type: 'challenge',name: 'Baby Frame',     date: '2026-07-04T16:41:33.000Z' },
-      { type: 'root',     name: 'Kobold',         date: '2026-07-04T10:07:59.000Z' },
-      { type: 'user',     name: 'Kobold',         date: '2026-07-04T09:57:50.000Z' },
-      { type: 'challenge',name: 'Forklifts R Us', date: '2026-07-04T15:40:07.000Z' },
-      { type: 'root',     name: 'Silentium',      date: '2026-07-04T14:24:36.000Z' },
-      { type: 'user',     name: 'Silentium',      date: '2026-07-04T10:40:59.000Z' },
-      { type: 'user',     name: 'Nexus',          date: '2026-06-27T20:39:54.000Z' },
-      { type: 'user',     name: 'Enigma',         date: '2026-06-27T19:47:21.000Z' },
-      { type: 'challenge',name: 'Cat',            date: '2026-06-25T12:00:00.000Z' },
-      { type: 'challenge',name: 'ReactOOPS',      date: '2026-06-24T12:00:00.000Z' },
-      { type: 'challenge',name: 'Uplink',         date: '2026-06-23T12:00:00.000Z' },
-      { type: 'sherlock',  name: 'FortySeven-1',  date: '2026-06-09T12:00:00.000Z' },
-      { type: 'sherlock',  name: 'Brutus',        date: '2026-06-08T12:00:00.000Z' },
-    ],
   };
 
   /* ============================================================
@@ -72,26 +55,6 @@
    *  HELPERS
    * ============================================================ */
 
-  function formatDate(iso) {
-    const d = new Date(iso);
-    const now = new Date();
-    const diff = (now - d) / 1000;
-    if (diff < 60) return 'just now';
-    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
-    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  }
-
-  function activityIcon(type) {
-    switch (type) {
-      case 'root': case 'user': return '<svg viewBox="0 0 24 24" fill="none" width="14" height="14"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.5"/></svg>';
-      case 'challenge': return '<svg viewBox="0 0 24 24" fill="none" width="14" height="14"><path d="M12 3l3 6 7 1-5 5 1 7-6-3-6 3 1-7-5-5 7-1z" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>';
-      case 'sherlock': return '<svg viewBox="0 0 24 24" fill="none" width="14" height="14"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M12 8v4l3 3" stroke="currentColor" stroke-width="1.5"/></svg>';
-      default: return '';
-    }
-  }
-
   /* ============================================================
    *  RENDER SECTION
    * ============================================================ */
@@ -114,7 +77,7 @@
       <div class="htb-header-row">
         <div>
           <div class="section-label">hack the box</div>
-          <h2 class="section-title">stats & activity</h2>
+          <h2 class="section-title">stats</h2>
         </div>
         <span class="htb-live-badge">live data</span>
       </div>
@@ -153,17 +116,6 @@
           <div class="htb-stat-number" data-count="${s.points}">0</div>
           <div class="htb-stat-label">Season Pts</div>
         </div>
-      </div>
-      <div class="htb-activity-header reveal">recent activity</div>
-      <div class="htb-activity-list reveal">
-        ${d.activity.slice(0, 8).map(a => `
-          <div class="htb-activity-item">
-            <div class="htb-activity-icon ${a.type === 'root' || a.type === 'user' ? 'machine' : a.type}">${activityIcon(a.type)}</div>
-            <span class="htb-activity-name">${a.name}</span>
-            <span class="htb-activity-type ${a.type}">${a.type}</span>
-            <span class="htb-activity-date">${formatDate(a.date)}</span>
-          </div>
-        `).join('')}
       </div>
       <a href="https://app.hackthebox.com/users/${d.user.id}" target="_blank" class="htb-profile-link reveal">
         <svg viewBox="0 0 24 24"><path d="M12 1l9 5v10l-9 5-9-5V6zm0 2.18L5 7.5v7l7 3.82 7-3.82v-7z"/></svg>
