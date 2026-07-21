@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-21T04:18:11.654197Z",
+  "updated": "2026-07-21T07:35:25.101953Z",
   "user": {
     "id": 2589442,
     "name": "thesungod25"
@@ -12,13 +12,13 @@
     "id": 15,
     "name": "Season 11",
     "league": "Ruby",
-    "rank": 2002,
-    "totalParticipants": 11848,
-    "points": 395,
+    "rank": 1701,
+    "totalParticipants": 11849,
+    "points": 425,
     "active": true
   },
   "stats": {
-    "machines": 12,
+    "machines": 13,
     "machinesRooted": 11,
     "challenges": 18,
     "sherlocks": 2
