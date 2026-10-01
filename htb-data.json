@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-01T05:15:47.517584Z",
+  "updated": "2026-10-01T12:50:50.908867Z",
   "user": {
     "id": 2589442,
     "name": "thesungod25"
@@ -9,17 +9,17 @@
     "title": "Hacker"
   },
   "season": {
-    "id": 15,
-    "name": "Season 11",
-    "league": "Platinum",
-    "rank": 1897,
-    "totalParticipants": 0,
-    "points": 0,
+    "id": 21,
+    "name": "Season 12",
+    "league": "Bronze",
+    "rank": 2040,
+    "totalParticipants": 2249,
+    "points": 65,
     "active": true
   },
   "stats": {
-    "machines": 14,
-    "machinesRooted": 13,
+    "machines": 15,
+    "machinesRooted": 14,
     "challenges": 18,
     "sherlocks": 2
   }
